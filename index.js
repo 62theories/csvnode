@@ -1,10 +1,11 @@
 const fs = require("fs");
-const csv = require("csv-parser");
+const csvParser = require("csv-parser");
+const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 
 let results = [];
 
 fs.createReadStream("./input.csv")
-  .pipe(csv())
+  .pipe(csvParser())
   .on("data", (data) => results.push(data))
   .on("end", () => {
     const sumArr = results.reduce((acc, cur) => {
@@ -19,5 +20,13 @@ fs.createReadStream("./input.csv")
       }
       return acc;
     }, []);
-    console.log(sumArr);
+    // console.log(sumArr);
+    const csvWriter = createCsvWriter({
+      path: "out.csv",
+      header: [
+        { id: "company", title: "company" },
+        { id: "sum", title: "sum" },
+      ],
+    });
+    csvWriter.writeRecords(sumArr).then(() => console.log("finish"));
   });
